@@ -44,7 +44,7 @@ public class BinarySearchTreeTest {
     void testInsertDuplicateValues() {
         bst.insert(10);
         bst.insert(10);
-
+        bst.displayTree();
         assertEquals(1, bst.length(), "Tree should not increase size for duplicate inserts");
     }
 

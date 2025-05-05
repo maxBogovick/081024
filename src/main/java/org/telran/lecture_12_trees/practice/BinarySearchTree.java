@@ -1,14 +1,22 @@
 package org.telran.lecture_12_trees.practice;
 
+import org.telran.utils.TreePrinter;
+
 public class BinarySearchTree {
     private Node root;
+    private TreePrinter<Node> treePrinter;
     private int length = 0;
 
     /**
      * Конструктор для создания нового бинарного дерева поиска.
      */
     public BinarySearchTree() {
-        // TODO: инициализируйте дерево при необходимости
+        root = null;
+        treePrinter = new TreePrinter<>(node-> String.valueOf(node.getValue()), Node::getLeft, Node::getRight);
+        treePrinter.setTspace(2);
+        treePrinter.setSquareBranches(true);
+        treePrinter.setLrAgnostic(false);
+        treePrinter.setHspace(2);
     }
 
     /**
@@ -17,8 +25,18 @@ public class BinarySearchTree {
      * @param value Значение нового узла.
      */
     public void insert(int value) {
+        /*if (root == null) {
+            root = new Node(value); //10
+        }
+        if (value < root.getValue()) {
+            root.setLeft(new Node(value));
+        }
+        else if (value > root.getValue()) {
+            root.setRight(new Node(value));
+        }
         // TODO: реализуйте метод вставки узла
-        throw new UnsupportedOperationException("insert() is not implemented yet");
+        throw new UnsupportedOperationException("insert() is not implemented yet");*/
+        root = insertNodeRec(root, value);
     }
 
     /**
@@ -29,8 +47,18 @@ public class BinarySearchTree {
      * @return Новый корень поддерева.
      */
     private Node insertNodeRec(Node node, int value) {
-        // TODO: реализуйте рекурсивную вставку
-        throw new UnsupportedOperationException("insertNodeRec() is not implemented yet");
+        if (node == null) {
+            length++;
+            return new Node(value);
+        }
+        if (value < node.getValue()) {
+            node.setLeft(insertNodeRec(node.getLeft(), value));
+        }
+        else if (value > node.getValue()) {
+            node.setRight(insertNodeRec(node.getRight(), value));
+        }
+
+        return node;
     }
 
     /**
@@ -76,8 +104,7 @@ public class BinarySearchTree {
      * Возвращает количество узлов в дереве.
      */
     public int length() {
-        // TODO: реализуйте подсчёт количества узлов
-        throw new UnsupportedOperationException("length() is not implemented yet");
+        return length;
     }
 
     /**
@@ -88,8 +115,7 @@ public class BinarySearchTree {
             System.out.println("Дерево пустое.");
             return;
         }
-        // TODO: реализуйте вывод дерева
-        throw new UnsupportedOperationException("displayTree() is not implemented yet");
+        treePrinter.printTree(root);
     }
 
     /**
@@ -121,7 +147,14 @@ public class BinarySearchTree {
      */
     public static void main(String[] args) {
         BinarySearchTree bst = new BinarySearchTree();
-        bst.insert(3); // TODO: после реализации insert метод должен вставить значение
+        bst.insert(10);
+        bst.insert(3);
+        bst.insert(5);
+        bst.insert(4);
+        bst.insert(11);
+        bst.insert(15);
+        bst.insert(12);
+        bst.insert(16);
         bst.displayTree(); // TODO: после реализации должен напечатать дерево
     }
 }
