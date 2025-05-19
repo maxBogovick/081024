@@ -70,21 +70,9 @@ public class HashTable {
     }
 
     private void resize() {
-        int newCapacity = capacity * 2;
         // Шаг 1: вычислить новыйCapacity = capacity * 2
         // Шаг 2: создать новый массив Entry[newCapacity]
-        Entry[] newTable = new Entry[newCapacity];
         // Шаг 3: для каждого элемента старой таблицы:
-        for (int i = 0; i < capacity; i++) {
-            Entry current = table[i];
-            while (current != null) {
-                Entry next = current.getNext();
-                int newIndex = Math.abs(current.getKey())%newCapacity;
-                current.setNext(newTable[newIndex]);
-                newTable[newIndex] = current;
-                current = next;
-            }
-        }
         //   - обходить цепочку, сохранять next
         //   - пересчитать индекс для нового массива
         //   - вставить элемент в начало новой цепочки
