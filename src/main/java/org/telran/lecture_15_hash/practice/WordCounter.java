@@ -1,5 +1,7 @@
 package org.telran.lecture_15_hash.practice;
 
+import java.util.Locale;
+
 /**
  * Класс для подсчета количества вхождений слов в предложении.
  */
@@ -12,14 +14,22 @@ public class WordCounter {
      * @return хеш-таблица, содержащая слова и количество их вхождений
      */
     public static CommonHashTable process(String sentence) {
-        // Создание хеш-таблицы с начальной емкостью 10
-        // Преобразование предложения в нижний регистр и разбиение на слова
-        // Итерация по каждому слову в массиве слов
-        // Пропуск пустых слов
-        // Если слово уже существует в хеш-таблице, увеличение его счетчика
-        // Иначе добавление слова в хеш-таблицу с начальным значением 1
-        // Возврат хеш-таблицы с подсчитанными словами
-        throw new UnsupportedOperationException("Method process not implemented yet");
+
+        CommonHashTable table = new CommonHashTable(); // word, count times this, 2
+
+        String[] words = sentence.toLowerCase().split("\\s+");
+        for (String word: words) {
+            if (word.isBlank()) {
+                continue;
+            }
+            if (table.containsKey(word)) {
+                int value = (int) table.get(word);
+                table.put(word, value + 1);
+            } else {
+                table.put(word, 1);
+            }
+        }
+        return table;
     }
 
     /**
@@ -29,5 +39,20 @@ public class WordCounter {
      */
     public static void main(String[] args) {
         // Обработка предложения и вывод результата
+        String text = "This is simple text and this is one and two the three hello world and";
+        //"this" -> 2
+        CommonHashTable table = process(text);
+        table.printTable();
+        System.out.println("word this = " + table.get("this"));
+
+        System.out.println(12==12);
+
+        String str1 = new String("12");
+        String str2 = new String("12");
+        System.out.println(str1.equals(str2));
+
+
+
+
     }
 }

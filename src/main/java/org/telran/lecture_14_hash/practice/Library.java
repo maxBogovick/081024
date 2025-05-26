@@ -118,22 +118,10 @@ public class Library {
         Library library = new Library(10);
 
         library.add(0, "Book 1");
-        library.add(2, "Book 2");
-        library.add(5, "Book 3");
-        library.add(9, "Book 4");
-        library.add(100, "Book 5");
-        library.add(20, "Book 6");
-        library.add(15, "Book 7");
+        library.add(1, "Book 2");
 
         //System.out.println(Arrays.toString(library.books));
 
-        library.printTable();
-        System.out.println(library.getBook(100));
-        System.out.println("Get book by key = 9");
-        System.out.println(library.getBook(9));
-        System.out.println("Remove book by key = 9");
-        library.remove(9);
-        //System.out.println("Get book by key = 9 " + library.getBook(9));
         library.printTable();
     }
 }

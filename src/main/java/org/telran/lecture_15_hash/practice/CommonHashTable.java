@@ -1,5 +1,7 @@
 package org.telran.lecture_15_hash.practice;
 
+import org.telran.lecture_14_hash.practice.Library;
+
 /**
  * Простая реализация хеш-таблицы с цепочечной обработкой коллизий.
  * Использует массив связных списков (Entry), коэффициент загрузки и простую хеш-функцию.
@@ -9,10 +11,19 @@ public class CommonHashTable {
     /**
      * Внутренний класс, представляющий элемент таблицы.
      */
-    private class Entry {
+    private class Node {
         private Object key;
         private Object value;
-        private Entry next;
+        private Node next;
+
+        @Override
+        public String toString() {
+            return "Node{" +
+                    "key=" + key +
+                    ", value=" + value +
+                    ", next=" + next +
+                    '}';
+        }
 
         /**
          * Конструктор создаёт новую запись с заданным ключом и значением.
@@ -20,17 +31,39 @@ public class CommonHashTable {
          * @param key   ключ
          * @param value значение
          */
-        public Entry(Object key, Object value) {
-            // 1. Сохрани key и value в соответствующие поля.
-            // 2. next по умолчанию должен быть null.
+        public Node(Object key, Object value) {
+            this.key = key;
+            this.value = value;
         }
 
-        // 3. Реализуй геттеры: getKey(), getValue(), getNext()
-        // 4. Реализуй сеттеры: setValue(value), setNext(next)
+        public Object getKey() {
+            return key;
+        }
+
+        public void setKey(Object key) {
+            this.key = key;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public void setValue(Object value) {
+            this.value = value;
+        }
+
+        public Node getNext() {
+            return next;
+        }
+
+        public void setNext(Node next) {
+            this.next = next;
+        }
     }
 
-    // 5. Объяви массив Entry[] table для хранения цепочек.
-    // 6. Объяви переменные capacity (ёмкость таблицы) и size (количество элементов).
+    private Node[] table;
+    private int capacity;
+    private int size;
     // 7. Установи константу LOAD_FACTOR (например, 0.75).
 
     /**
@@ -42,6 +75,12 @@ public class CommonHashTable {
         // 8. Проверь, что initialCapacity > 0, иначе выбрось IllegalArgumentException.
         // 9. Инициализируй table с указанной вместимостью.
         // 10. Установи начальное значение size = 0.
+        if (initialCapacity <=0) {
+            throw  new IllegalArgumentException("Initial capacity must be greater than 0");
+        }
+        this.capacity = initialCapacity;
+        this.table = new Node[capacity];
+        this.size = 0;
     }
 
     /**
@@ -49,6 +88,7 @@ public class CommonHashTable {
      */
     public CommonHashTable() {
         // 11. Вызови основной конструктор с параметром 16.
+        this(16);
     }
 
     /**
@@ -58,11 +98,22 @@ public class CommonHashTable {
      * @return положительное хеш-значение
      */
     private int hash(Object key) {
-        // 12. Если key — Integer: верни Math.abs((Integer) key).
-        // 13. Если key — String: используй формулу: hash = hash * 31 + charAt(i).
-        // 14. Иначе: используй key.hashCode().
-        // 15. Верни абсолютное значение хеша.
-        throw new UnsupportedOperationException("Method hash not implemented yet");
+        if (key instanceof Integer) {
+            return Math.abs((int) key);
+        } else if (key instanceof String) {
+            String input = (String)key;
+            if (input == null) {
+                return 0;
+            }
+            int hash = 0;
+            int magicNumber = 31;
+            for (int i = 0; i < input.length(); i++) {
+                hash = hash * magicNumber + input.charAt(i);
+            }
+            return Math.abs(hash);
+        } else {
+            throw new UnsupportedOperationException("This method doesn't supported for this data type");
+        }
     }
 
     /**
@@ -73,7 +124,10 @@ public class CommonHashTable {
      */
     private int getIndex(Object key) {
         // 16. Верни hash(key) % capacity.
-        throw new UnsupportedOperationException("Method getIndex not implemented yet");
+        int hash = hash(key);
+        int index = hash % capacity;
+        //System.out.println("for key = " + key + " hash = " + hash + " index = " + index + " length of array = " + table.length);
+        return index;
     }
 
     /**
@@ -85,8 +139,31 @@ public class CommonHashTable {
     public void put(Object key, Object value) {
         // 17. Если текущая загрузка (size / capacity) >= LOAD_FACTOR — вызови resize().
         // 18. Получи индекс для key через getIndex(key).
+        if ((double) size / capacity >= 0.75) {
+            resize();
+        }
+        int index = getIndex(key);
+
+        Node newNode = new Node(key, value);
         // 19. Создай новый Entry(key, value).
         // 20. Если table[index] == null — запиши новый элемент и увеличь size.
+        if (table[index] == null) {
+            table[index] = newNode;
+            size++;
+        } else {
+            Node current = table[index];
+            Node prev = null;
+            while (current != null) {
+                if (current.key.equals(key)) {
+                    current.value = value;
+                    return;
+                }
+                prev = current;
+                current = current.next;
+            }
+            prev.next = newNode;
+            size++;
+        }
         // 21. Иначе — пройдись по цепочке:
         //     а. Если найден элемент с таким же key — обнови его value и вернись.
         //     б. Иначе — добавь новый элемент в конец цепочки и увеличь size.
@@ -96,12 +173,18 @@ public class CommonHashTable {
      * Увеличивает размер таблицы и перераспределяет все элементы.
      */
     private void resize() {
-        // 22. Удвоить capacity.
-        // 23. Сохрани старую table.
-        // 24. Создай новую table с новой capacity.
-        // 25. Обнули размер (size = 0).
-        // 26. Для каждой цепочки в старой таблице:
-        //     пройдись по всем элементам и вставь их в новую таблицу через put().
+        int oldCapacity = capacity;
+        Node[] oldNodes = table;
+        capacity = capacity * 2;
+        table = new Node[capacity];
+        size = 0;
+        for (int i = 0; i < oldCapacity; i++) {
+            Node node = oldNodes[i];
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
     }
 
     /**
@@ -111,11 +194,17 @@ public class CommonHashTable {
      * @return значение или null
      */
     public Object get(Object key) {
-        // 27. Получи индекс через getIndex(key).
-        // 28. Пройдись по цепочке:
-        //     если key найден — верни value.
-        //     если дошли до конца — верни null.
-        throw new UnsupportedOperationException("Method get not implemented yet");
+        int index = getIndex(key); //3 hash % 4 => 3  10 hash %10 =>
+        Node node = table[index];
+
+        while (node != null) {
+            if (node.key.equals(key)) {
+                return node.value;
+            }
+            node = node.next;
+        }
+
+        return null;
     }
 
     /**
@@ -125,12 +214,29 @@ public class CommonHashTable {
      * @return значение удалённого элемента или null
      */
     public Object remove(Object key) {
-        // 29. Получи индекс через getIndex(key).
-        // 30. Пройдись по цепочке:
-        //     а. Если найден элемент — удали его из цепочки (обнови ссылки).
-        //     б. Уменьши size и верни его value.
-        //     в. Если не найден — верни null.
-        throw new UnsupportedOperationException("Method remove not implemented yet");
+        int index = getIndex(key);
+        if (index < 0) {
+            return null;
+        }
+        Node node = table[index];
+        if (node == null) {
+            return null;
+        }
+        if (node.key == key) {
+            Object value = node.value;
+            table[index] = node.next;
+            size--;
+            return value;
+        }
+        while (node.next != null) {
+            if (node.next.key == key) {
+                Object value = node.next.value;
+                node.next = node.next.next;
+                size--;
+                return value;
+            }
+        }
+        return null;
     }
 
     /**
@@ -140,8 +246,7 @@ public class CommonHashTable {
      * @return true, если ключ найден
      */
     public boolean containsKey(Object key) {
-        // 31. Используй метод get(key), верни true, если результат не null.
-        throw new UnsupportedOperationException("Method containsKey not implemented yet");
+        return get(key) != null;
     }
 
     /**
@@ -150,8 +255,7 @@ public class CommonHashTable {
      * @return размер таблицы
      */
     public int size() {
-        // 32. Верни переменную size.
-        return 0;
+        return size;
     }
 
     /**
@@ -160,15 +264,15 @@ public class CommonHashTable {
      * @return true, если size == 0
      */
     public boolean isEmpty() {
-        // 33. Верни результат size == 0.
-        return false;
+        return size == 0;
     }
 
     /**
      * Очищает таблицу.
      */
     public void clear() {
-        // 34. Создай новый пустой массив table и обнули size.
+        table = new Node[capacity];
+        size = 0;
     }
 
     /**
@@ -186,8 +290,21 @@ public class CommonHashTable {
      * Выводит таблицу в консоль (для отладки).
      */
     public void printTable() {
-        // 37. Пройдись по каждому индексу table.
-        // 38. Для каждой цепочки выведи ключи и значения, укажи длину цепочки.
+        for (int i = 0; i < table.length; i++) {
+            System.out.print(i + ": ");
+
+            // Показываем количество элементов в цепочке для наглядности
+            int chainLength = 0;
+            Node current = table[i];
+
+            while (current != null) {
+                System.out.print("[" + current.key + ":" + current.value + "] → ");
+                current = current.next;
+                chainLength++;
+            }
+
+            System.out.println("null" + (chainLength > 0 ? " (длина цепочки: " + chainLength + ")" : ""));
+        }
     }
 
     /**
@@ -196,6 +313,21 @@ public class CommonHashTable {
      * @param args аргументы командной строки
      */
     public static void main(String[] args) {
+
+       CommonHashTable hashTable = new CommonHashTable(4);
+
+        hashTable.put("1234", "Book1");
+        hashTable.put("ased4", "Book2");
+        hashTable.put("4", "Book22");
+        hashTable.printTable();
+        hashTable.put("s3r0", "Book3");
+        hashTable.put("3224", "Book4");
+        hashTable.printTable();
+        hashTable.put("32ws1111111111", "Book5");
+        hashTable.printTable();
+
+        System.out.println(hashTable.get("3224"));
+
         // 39. Создай таблицу и вызови put() с разными ключами.
         // 40. Вызови printTable(), get(), remove(), containsKey() для проверки.
     }
