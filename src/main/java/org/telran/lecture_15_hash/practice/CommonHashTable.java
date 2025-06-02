@@ -222,14 +222,14 @@ public class CommonHashTable {
         if (node == null) {
             return null;
         }
-        if (node.key == key) {
+        if (node.key.equals(key)) {
             Object value = node.value;
             table[index] = node.next;
             size--;
             return value;
         }
         while (node.next != null) {
-            if (node.next.key == key) {
+            if (node.next.key.equals(key)) {
                 Object value = node.next.value;
                 node.next = node.next.next;
                 size--;
@@ -283,6 +283,11 @@ public class CommonHashTable {
     public Object[] values() {
         // 35. Создай массив размера size.
         // 36. Пройдись по всем цепочкам в table и скопируй значения в массив.
+        return new Object[0];
+    }
+    public Object[] keys() {
+        // 35. Создай массив размера size.
+        // 36. Пройдись по всем цепочкам в table и скопируй ключи в массив.
         return new Object[0];
     }
 
